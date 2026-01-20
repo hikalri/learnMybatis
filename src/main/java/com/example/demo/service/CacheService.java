@@ -47,7 +47,7 @@ public class CacheService {
         logger.info("=== 演示单个用户查询缓存 ===");
 
         // 创建测试用户
-        User testUser = new User(null, "测试用户", "test@example.com", 25);
+        User testUser = new User(null, "测试用户", "test@example.com", 25, null);
         userService.createUser(testUser);
 
         // 第一次查询用户，应该从数据库获取

@@ -1,69 +1,115 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper
-        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.demo.mapper.UserMapper">
     <cache type="org.mybatis.caches.ehcache.EhcacheCache" />
 
     <!-- 结果映射 -->
     <resultMap id="userResultMap" type="User">
-        <id property="id" column="id"/>
-        <result property="name" column="name"/>
-        <result property="email" column="email"/>
-        <result property="age" column="age"/>
+        <id property="id" column="id" />
+        <result property="name" column="name" />
+        <result property="email" column="email" />
+        <result property="age" column="age" />
+        <result property="departmentId" column="department_id" />
+    </resultMap>
+
+    <!-- 带部门关联的结果映射（多对一关系） -->
+    <resultMap id="userWithDepartmentResultMap" type="User" extends="userResultMap">
+        <association
+            property="department"
+            resultMap="com.example.demo.mapper.DepartmentMapper.departmentResultMap"
+            columnPrefix="dept_"
+        >
+        </association>
+    </resultMap>
+
+    <!-- 带订单关联的结果映射（一对多关系） -->
+    <resultMap id="userWithOrdersResultMap" type="User" extends="userResultMap">
+        <collection property="orders" ofType="Order">
+            <id property="id" column="order_id" />
+            <result property="orderNo" column="order_no" />
+            <result property="amount" column="order_amount" />
+            <result property="userId" column="order_user_id" />
+            <result property="orderTime" column="order_time" />
+        </collection>
+    </resultMap>
+
+    <!-- 带部门和订单关联的结果映射（完整关联） -->
+    <resultMap id="userWithDepartmentAndOrdersResultMap" type="User" extends="userResultMap">
+        <association property="department" javaType="Department">
+            <id property="id" column="dept_id" />
+            <result property="name" column="dept_name" />
+            <result property="description" column="dept_description" />
+            <result property="createdTime" column="dept_created_time" />
+        </association>
+        <collection property="orders" ofType="Order">
+            <id property="id" column="order_id" />
+            <result property="orderNo" column="order_no" />
+            <result property="amount" column="order_amount" />
+            <result property="userId" column="order_user_id" />
+            <result property="orderTime" column="order_time" />
+        </collection>
     </resultMap>
 
     <!-- 根据ID查询用户 -->
-    <select id="selectById" resultMap="userResultMap">
-        SELECT id, name, email, age
-        FROM user
-        WHERE id = #{id}
-    </select>
+    <select id="selectById" resultMap="userResultMap"> SELECT id, name, email, age, department_id
+        FROM user WHERE id = #{id} </select>
 
     <!-- 查询所有用户 -->
-    <select id="selectAll" resultMap="userResultMap">
-        SELECT id, name, email, age
-        FROM user
-    </select>
+    <select id="selectAll" resultMap="userResultMap"> SELECT id, name, email, age, department_id
+        FROM user </select>
 
     <!-- 分页查询用户 -->
-    <select id="selectByPage" resultMap="userResultMap">
-        SELECT id, name, email, age
-        FROM user
-        LIMIT #{offset}, #{pageSize}
-    </select>
+    <select id="selectByPage" resultMap="userResultMap"> SELECT id, name, email, age, department_id
+        FROM user LIMIT #{offset}, #{pageSize} </select>
 
     <!-- 查询用户总数 -->
-    <select id="selectCount" resultType="long">
-        SELECT COUNT(*)
-        FROM user
-    </select>
+    <select id="selectCount" resultType="long"> SELECT COUNT(*) FROM user </select>
 
     <!-- 插入用户 -->
-    <insert id="insert" parameterType="User" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO user (name, email, age)
-        VALUES (#{name}, #{email}, #{age})
-    </insert>
+    <insert id="insert" parameterType="User" useGeneratedKeys="true" keyProperty="id"> INSERT INTO
+        user (name, email, age, department_id) VALUES (#{name}, #{email}, #{age}, #{departmentId}) </insert>
 
     <!-- 更新用户 -->
-    <update id="update" parameterType="User">
-        UPDATE user
-        SET name = #{name},
-            email = #{email},
-            age = #{age}
-        WHERE id = #{id}
-    </update>
+    <update id="update" parameterType="User"> UPDATE user SET name = #{name}, email = #{email}, age
+        = #{age}, department_id = #{departmentId} WHERE id = #{id} </update>
 
     <!-- 根据ID删除用户 -->
-    <delete id="deleteById">
-        DELETE FROM user WHERE id = #{id}
-    </delete>
+    <delete id="deleteById"> DELETE FROM user WHERE id = #{id} </delete>
 
     <!-- 根据用户名查询用户 -->
-    <select id="selectByUsername" resultMap="userResultMap">
-        SELECT id, name, email, age
-        FROM user
-        WHERE name = #{username}
-    </select>
+    <select id="selectByUsername" resultMap="userResultMap"> SELECT id, name, email, age,
+        department_id FROM user WHERE name = #{username} </select>
+
+    <!-- 根据ID查询用户及其部门（多对一关系） -->
+    <select id="selectWithDepartment" resultMap="userWithDepartmentResultMap"> SELECT u.id, u.name,
+        u.email, u.age, u.department_id, d.id as dept_id, d.name as dept_name, d.description as
+        dept_description, d.created_time as dept_created_time FROM user u LEFT JOIN department d ON
+        u.department_id = d.id WHERE u.id = #{id} </select>
+
+    <!-- 查询所有用户及其部门（多对一关系） -->
+    <select id="selectAllWithDepartment" resultMap="userWithDepartmentResultMap"> SELECT u.id,
+        u.name, u.email, u.age, u.department_id, d.id as dept_id, d.name as dept_name, d.description
+        as dept_description, d.created_time as dept_created_time FROM user u LEFT JOIN department d
+        ON u.department_id = d.id ORDER BY u.id </select>
+
+    <!-- 根据ID查询用户及其订单（一对多关系） -->
+    <select id="selectWithOrders" resultMap="userWithOrdersResultMap"> SELECT u.id, u.name, u.email,
+        u.age, u.department_id, o.id as order_id, o.order_no, o.amount as order_amount, o.user_id as
+        order_user_id, o.order_time FROM user u LEFT JOIN orders o ON u.id = o.user_id WHERE u.id =
+        #{id} </select>
+
+    <!-- 查询所有用户及其订单（一对多关系） -->
+    <select id="selectAllWithOrders" resultMap="userWithOrdersResultMap"> SELECT u.id, u.name,
+        u.email, u.age, u.department_id, o.id as order_id, o.order_no, o.amount as order_amount,
+        o.user_id as order_user_id, o.order_time FROM user u LEFT JOIN orders o ON u.id = o.user_id
+        ORDER BY u.id </select>
+
+    <!-- 根据ID查询用户及其部门和订单（完整关联） -->
+    <select id="selectWithDepartmentAndOrders" resultMap="userWithDepartmentAndOrdersResultMap">
+        SELECT u.id, u.name, u.email, u.age, u.department_id, d.id as dept_id, d.name as dept_name,
+        d.description as dept_description, d.created_time as dept_created_time, o.id as order_id,
+        o.order_no, o.amount as order_amount, o.user_id as order_user_id, o.order_time FROM user u
+        LEFT JOIN department d ON u.department_id = d.id LEFT JOIN orders o ON u.id = o.user_id
+        WHERE u.id = #{id} </select>
 
 </mapper>

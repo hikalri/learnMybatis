@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.mapper.DepartmentMapper">
+    <cache type="org.mybatis.caches.ehcache.EhcacheCache" />
+
+    <!-- 结果映射 -->
+    <resultMap id="departmentResultMap" type="Department">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="description" column="description"/>
+        <result property="createdTime" column="created_time"/>
+    </resultMap>
+
+    <!-- 带用户关联的结果映射（一对多关系） -->
+    <resultMap id="departmentWithUsersResultMap" type="Department" extends="departmentResultMap">
+        <collection property="users" ofType="User">
+            <id property="id" column="user_id"/>
+            <result property="name" column="user_name"/>
+            <result property="email" column="user_email"/>
+            <result property="age" column="user_age"/>
+            <result property="departmentId" column="department_id"/>
+        </collection>
+    </resultMap>
+
+    <!-- 根据ID查询部门 -->
+    <select id="selectById" resultMap="departmentResultMap">
+        SELECT id, name, description, created_time
+        FROM department
+        WHERE id = #{id}
+    </select>
+
+    <!-- 查询所有部门 -->
+    <select id="selectAll" resultMap="departmentResultMap">
+        SELECT id, name, description, created_time
+        FROM department
+    </select>
+
+    <!-- 插入部门 -->
+    <insert id="insert" parameterType="Department" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO department (name, description)
+        VALUES (#{name}, #{description})
+    </insert>
+
+    <!-- 更新部门 -->
+    <update id="update" parameterType="Department">
+        UPDATE department
+        SET name = #{name},
+            description = #{description}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 根据ID删除部门 -->
+    <delete id="deleteById">
+        DELETE FROM department WHERE id = #{id}
+    </delete>
+
+    <!-- 根据ID查询部门及其关联的用户（一对多关系） -->
+    <select id="selectWithUsers" resultMap="departmentWithUsersResultMap">
+        SELECT d.id, d.name, d.description, d.created_time,
+               u.id as user_id, u.name as user_name, u.email as user_email,
+               u.age as user_age, u.department_id
+        FROM department d
+        LEFT JOIN user u ON d.id = u.department_id
+        WHERE d.id = #{id}
+    </select>
+
+    <!-- 查询所有部门及其关联的用户（一对多关系） -->
+    <select id="selectAllWithUsers" resultMap="departmentWithUsersResultMap">
+        SELECT d.id, d.name, d.description, d.created_time,
+               u.id as user_id, u.name as user_name, u.email as user_email,
+               u.age as user_age, u.department_id
+        FROM department d
+        LEFT JOIN user u ON d.id = u.department_id
+        ORDER BY d.id
+    </select>
+
+</mapper>

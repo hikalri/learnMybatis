@@ -31,7 +31,7 @@ public class DemoApplication {
 
         // 创建一些测试数据
         for (int i = 1; i <= 15; i++) {
-            User user = new User(null, "用户" + i, "user" + i + "@example.com", 20 + i);
+            User user = new User(null, "用户" + i, "user" + i + "@example.com", 20 + i, null);
             userService.createUser(user);
         }
 

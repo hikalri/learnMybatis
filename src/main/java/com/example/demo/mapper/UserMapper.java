@@ -28,4 +28,19 @@ public interface UserMapper {
 
     // 根据用户名查询用户
     User selectByUsername(String username);
+
+    // 根据ID查询用户及其部门（多对一关系）
+    User selectWithDepartment(Long id);
+
+    // 查询所有用户及其部门（多对一关系）
+    List<User> selectAllWithDepartment();
+
+    // 根据ID查询用户及其订单（一对多关系）
+    User selectWithOrders(Long id);
+
+    // 查询所有用户及其订单（一对多关系）
+    List<User> selectAllWithOrders();
+
+    // 根据ID查询用户及其部门和订单（完整关联）
+    User selectWithDepartmentAndOrders(Long id);
 }
