@@ -24,6 +24,7 @@
 
     <!-- 带订单关联的结果映射（一对多关系） -->
     <resultMap id="userWithOrdersResultMap" type="User" extends="userResultMap">
+        <!-- 如果要引用 OrderMapper.xml 中的 orderResultMap 需要给每个column都加上 order_ 前缀，order_order_time -->
         <collection property="orders" ofType="Order">
             <id property="id" column="order_id" />
             <result property="orderNo" column="order_no" />
@@ -35,11 +36,11 @@
 
     <!-- 带部门和订单关联的结果映射（完整关联） -->
     <resultMap id="userWithDepartmentAndOrdersResultMap" type="User" extends="userResultMap">
-        <association property="department" javaType="Department">
-            <id property="id" column="dept_id" />
-            <result property="name" column="dept_name" />
-            <result property="description" column="dept_description" />
-            <result property="createdTime" column="dept_created_time" />
+        <association
+            property="department"
+            resultMap="com.example.demo.mapper.DepartmentMapper.departmentResultMap"
+            columnPrefix="dept_"
+        >
         </association>
         <collection property="orders" ofType="Order">
             <id property="id" column="order_id" />

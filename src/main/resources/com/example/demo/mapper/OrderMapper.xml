@@ -16,12 +16,11 @@
 
     <!-- 带用户关联的结果映射（多对一关系） -->
     <resultMap id="orderWithUserResultMap" type="Order" extends="orderResultMap">
-        <association property="user" javaType="User">
-            <id property="id" column="user_id"/>
-            <result property="name" column="user_name"/>
-            <result property="email" column="user_email"/>
-            <result property="age" column="user_age"/>
-            <result property="departmentId" column="department_id"/>
+        <association
+            property="user"
+            resultMap="com.example.demo.mapper.UserMapper.userResultMap"
+            columnPrefix="user_"
+        >
         </association>
     </resultMap>
 
@@ -69,7 +68,7 @@
     <select id="selectWithUser" resultMap="orderWithUserResultMap">
         SELECT o.id, o.order_no, o.amount, o.user_id, o.order_time,
                u.id as user_id, u.name as user_name, u.email as user_email,
-               u.age as user_age, u.department_id
+               u.age as user_age, u.department_id as user_department_id
         FROM orders o
         LEFT JOIN user u ON o.user_id = u.id
         WHERE o.id = #{id}
@@ -79,7 +78,7 @@
     <select id="selectAllWithUser" resultMap="orderWithUserResultMap">
         SELECT o.id, o.order_no, o.amount, o.user_id, o.order_time,
                u.id as user_id, u.name as user_name, u.email as user_email,
-               u.age as user_age, u.department_id
+               u.age as user_age, u.department_id as user_department_id
         FROM orders o
         LEFT JOIN user u ON o.user_id = u.id
         ORDER BY o.id
