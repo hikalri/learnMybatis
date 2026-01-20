@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-
-    <!-- 控制台输出 -->
+    <!-- 控制台输出(ConsoleAppender) -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
@@ -9,11 +8,13 @@
         </encoder>
     </appender>
 
-    <!-- 文件输出 -->
+    <!-- 滚动文件输出源(RollingFileAppender) -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>logs/mybatis-demo.log</file>
+        <!-- 滚动策略 TimeBasedRollingPolicy 按天分割日志 -->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>logs/mybatis-demo.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <!-- 清理机制 30天 -->
             <maxHistory>30</maxHistory>
         </rollingPolicy>
         <encoder>
@@ -23,6 +24,8 @@
     </appender>
 
     <!-- MyBatis日志级别 -->
+    <!-- 设置为 DEBUG 输出大于等于 DEBUG 级别的日志-->
+    <!-- additivity="false" 不向上传递,不然会传递到Root 打印两次 -->
     <logger name="com.example.demo" level="DEBUG" additivity="false">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="FILE"/>
