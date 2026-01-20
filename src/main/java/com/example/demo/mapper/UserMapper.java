@@ -43,4 +43,10 @@ public interface UserMapper {
 
     // 根据ID查询用户及其部门和订单（完整关联）
     User selectWithDepartmentAndOrders(Long id);
+
+    // 根据ID查询用户（延迟加载部门和订单）
+    User selectWithLazyDepartmentAndOrders(Long id);
+
+    // 查询所有用户（延迟加载部门和订单）
+    List<User> selectAllWithLazyDepartmentAndOrders();
 }

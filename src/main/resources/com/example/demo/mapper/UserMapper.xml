@@ -51,6 +51,22 @@
         </collection>
     </resultMap>
 
+    <!-- 延迟加载部门和订单关联的结果映射（完整延迟加载） -->
+    <resultMap id="userWithLazyDepartmentAndOrdersResultMap" type="User" extends="userResultMap">
+        <association
+            property="department"
+            column="department_id"
+            select="com.example.demo.mapper.DepartmentMapper.selectById"
+            fetchType="lazy"
+        />
+        <collection
+            property="orders"
+            column="id"
+            select="com.example.demo.mapper.OrderMapper.selectByUserId"
+            fetchType="lazy"
+        />
+    </resultMap>
+
     <!-- 根据ID查询用户 -->
     <select id="selectById" resultMap="userResultMap"> SELECT id, name, email, age, department_id
         FROM user WHERE id = #{id} </select>
@@ -112,5 +128,17 @@
         o.order_no, o.amount as order_amount, o.user_id as order_user_id, o.order_time FROM user u
         LEFT JOIN department d ON u.department_id = d.id LEFT JOIN orders o ON u.id = o.user_id
         WHERE u.id = #{id} </select>
+
+    <!-- 根据ID查询用户（延迟加载部门和订单） -->
+    <select id="selectWithLazyDepartmentAndOrders" resultMap="userWithLazyDepartmentAndOrdersResultMap">
+        SELECT id, name, email, age, department_id
+        FROM user WHERE id = #{id}
+    </select>
+
+    <!-- 查询所有用户（延迟加载部门和订单） -->
+    <select id="selectAllWithLazyDepartmentAndOrders" resultMap="userWithLazyDepartmentAndOrdersResultMap">
+        SELECT id, name, email, age, department_id
+        FROM user
+    </select>
 
 </mapper>
