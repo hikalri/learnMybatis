@@ -46,9 +46,17 @@
     <!-- 更新订单 -->
     <update id="update" parameterType="Order">
         UPDATE orders
-        SET order_no = #{orderNo},
-            amount = #{amount},
-            user_id = #{userId}
+        <set>
+            <if test="orderNo != null">
+                order_no = #{orderNo},
+            </if>
+            <if test="amount != null">
+                amount = #{amount},
+            </if>
+            <if test="userId != null">
+                user_id = #{userId},
+            </if>
+        </set>
         WHERE id = #{id}
     </update>
 
