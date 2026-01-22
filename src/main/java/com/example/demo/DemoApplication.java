@@ -7,18 +7,25 @@ import com.example.demo.utils.Page;
 import com.example.demo.utils.PageParam;
 
 import java.util.List;
+import net.sf.ehcache.CacheManager;
+
 
 public class DemoApplication {
     public static void main(String[] args) {
         System.out.println("=== MyBatis项目功能演示 ===");
 
-        // 测试分页功能
-        testPagination();
+        try {
+            // 测试分页功能
+            testPagination();
 
-        // 测试缓存功能
-        testCache();
+            // 测试缓存功能
+            testCache();
 
-        System.out.println("\n=== 程序执行完成 ===");
+            System.out.println("\n=== 程序执行完成 ===");
+        } finally {
+            // 关闭所有资源，确保程序能正常退出
+            closeResources();
+        }
     }
 
     /**
@@ -81,5 +88,24 @@ public class DemoApplication {
 
         // 演示缓存统计信息
         cacheService.demonstrateCacheStats();
+    }
+
+    /**
+     * 关闭所有资源，确保程序能正常退出
+     */
+    private static void closeResources() {
+        System.out.println("\n=== 正在关闭资源 ===");
+
+        try {
+            // 关闭Ehcache缓存管理器
+            CacheManager cacheManager = CacheManager.getInstance();
+            if (cacheManager != null) {
+                cacheManager.shutdown();
+                System.out.println("✓ Ehcache CacheManager 已关闭");
+            }
+        } catch (Exception e) {
+            System.err.println("✗ 关闭Ehcache CacheManager时出错: " + e.getMessage());
+        }
+        System.out.println("=== 资源关闭完成 ===");
     }
 }
